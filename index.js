@@ -3,6 +3,8 @@ const config = require('./config'),
 
 const Koa = require('koa'),
       BodyParser = require('koa-bodyparser'),
+      Mount = require('koa-mount'),
+      Static = require('koa-static'),
       Session = require('koa-session');
 
 let app = new Koa();
@@ -25,6 +27,7 @@ app.use(Session({
 
 app.use(routes.routes());
 app.use(routes.allowedMethods());
+app.use(Mount('/static', Static(__dirname + '/static')));
 
 console.log(`Application listening on port ${port}.`);
 app.listen(port);

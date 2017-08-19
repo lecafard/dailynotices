@@ -17,6 +17,12 @@ class User {
         await db.run('UPDATE users SET quota=quota+1 WHERE id=?;', this.id);
         return this.quota++;
     }
+    
+    async decrementQuota() {
+        let db = await sqlite;
+        await db.run('UPDATE users SET quota=quota-1 WHERE id=?;', this.id);
+        return this.quota--;
+    }
 
     static async authenticate(id) {
         // Create user if not exists, set quota to 0

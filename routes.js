@@ -1,9 +1,11 @@
 const Router = require('koa-router');
+const Validate = require('koa2-validation');
 
 let router = Router();
 let AuthController = require('./controllers/auth');
 let IndexController = require('./controllers/index');
-let MessageController = require('./controllers/message');
+let NoticesController = require('./controllers/notices');
+
 
 async function checkAuth(ctx, next) {
     if(ctx.session.userId) {
@@ -13,6 +15,20 @@ async function checkAuth(ctx, next) {
     ctx.response.body = "Please log in"; 
 }
 
+async function errHandler(ctx, next) {
+    try {
+        await next();
+    } catch (err) { 
+        ctx.status = err.status || err.code || 500;
+        ctx.response.body = {
+            success: false,
+            message: (err.status == 400) ? err.message : 'Internal Server Error'
+        };
+    }
+}
+
+
+router.get('/', IndexController.home);
 router.get('/login', AuthController.authenticate);
 router.get('/login/callback', AuthController.authCallback);
 router.get('/logout', async function(ctx) {
@@ -20,13 +36,16 @@ router.get('/logout', async function(ctx) {
     ctx.redirect('/');
 });
 
-router.get('/api/me', checkAuth, IndexController.me);
-router.get('/api/me/messages', checkAuth, MessageController.listMe);
-router.get('/api/messages', checkAuth, MessageController.listAll);
-router.post('/api/messages', checkAuth, MessageController.new);
-router.get('/api/messages/:id', checkAuth, MessageController.get);
-router.put('/api/messages/:id', checkAuth, MessageController.modify);
+let apiRouter = new Router();
+
+apiRouter.get('/me',  IndexController.me);
+apiRouter.get('/me/notices', NoticesController.listMe);
+apiRouter.get('/notices', NoticesController.listAll);
+apiRouter.post('/notices', Validate(NoticesController.v.new), NoticesController.new);
+apiRouter.get('/notices/:id', Validate(NoticesController.v.get), NoticesController.get);
+apiRouter.put('/notices/:id', Validate(NoticesController.v.modify), NoticesController.modify);
+apiRouter.delete('/notices/:id', Validate(NoticesController.v.delete), NoticesController.delete);
+
+router.use('/api', checkAuth, errHandler, apiRouter.routes(), apiRouter.allowedMethods());
 
 module.exports = router;
-
-

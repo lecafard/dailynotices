@@ -3,7 +3,7 @@ CREATE TABLE users (
     quota INT DEFAULT 0
 );
 
-CREATE TABLE messages (
+CREATE TABLE notices (
     id CHAR(24)  PRIMARY KEY,
     user_id CHAR(9) DEFAULT "anonymous",
     title VARCHAR(32),
