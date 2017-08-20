@@ -42,7 +42,7 @@ server.listen(port, (err) => {
 });
 server.on('error', (e) => {
     if(parseInt(port, 10)) {
-        throw err;
+        throw e;
     }
 
     fs.unlinkSync(port);
