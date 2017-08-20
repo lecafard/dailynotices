@@ -19,11 +19,16 @@ async function errHandler(ctx, next) {
     try {
         await next();
     } catch (err) { 
+        if (err.status != 400) {
+            console.error(err);
+            err.status = 500;
+        }
+
         ctx.status = err.status || err.code || 500;
         ctx.response.body = {
             success: false,
             message: (err.status == 400) ? err.message : 'Internal Server Error'
-        };
+        }
     }
 }
 

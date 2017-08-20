@@ -17,12 +17,13 @@ exports.new = async function(ctx) {
         ctx.status = 403;
         return ctx.response.body = "Quota used up";
     }
-    let {title, message, teacher, anonymous} = ctx.request.body;
+    let {title, message, addressed_to, author_name, anonymous} = ctx.request.body;
     
     let msg = new Notice({
         title,
         message,
-        teacher,
+        addressed_to,
+        author_name,
         user_id: anonymous ? 'anonymous' : ctx.session.userId
     });
 
@@ -32,14 +33,17 @@ exports.new = async function(ctx) {
         ctx.response.body = {success: true, notice: msg};
     } catch(e) {
         ctx.status = 500;
-        ctx.response.body = 'Failed';
+        ctx.response.body = {status: false, message: 'Internal Server Error'};
     }
 }
 exports.v.new = {
-    title: Joi.string().max(32).required(),
-    message: Joi.string().min(3).max(200).required(),
-    teacher: Joi.string().max(32).required(),
-    anonymous: Joi.boolean()
+    body: {
+        anonymous: Joi.boolean(),
+        title: Joi.string().max(50).required(),
+        message: Joi.string().min(4).max(500).required(),
+        addressed_to: Joi.string().max(40).required(),
+        author_name: Joi.string().max(40).required()
+    }
 };
 
 /*
@@ -66,13 +70,14 @@ exports.v.get = {
  */
 exports.modify = async function(ctx) {
     let id = ctx.params.id;
-    let {title, message, teacher} = ctx.request.body;
+    let {title, message, addressed_to, author_name} = ctx.request.body;
 
     let msg = new Notice({
         id,
         title,
         message,
-        teacher
+        addressed_to,
+        author_name
     });
 
     try { 
@@ -92,9 +97,10 @@ exports.v.modify = {
         id: Joi.string().hex().length(24)
     },
     body: {
-        title: Joi.string().max(32).required(),
-        message: Joi.string().min(3).max(200).required(),
-        teacher: Joi.string().max(32).required()
+        title: Joi.string().max(50).required(),
+        message: Joi.string().min(4).max(500).required(),
+        addressed_to: Joi.string().max(40).required(),
+        author_name: Joi.string().max(40).required()
     }
 };
 
@@ -122,19 +128,14 @@ exports.listAll = async function(ctx) {
 exports.delete = async function(ctx) {
     var id = ctx.params.id;
     
-    try { 
-        let result = await msg.deleteByUser(id, ctx.session.userId);
-        if(result.changes) {
-            let user = User.get(ctx.session.userId);
-            await user.decrementQuota();
-            return ctx.response.body = msg;
-        }
-        ctx.status = 403;
-        ctx.response.body = {status: false, message: 'Unauthorised.'};
-    } catch(e) {
-        ctx.status = 500;
-        ctx.response.body = {status: false, message: 'Internal Server Error'};
+    let result = await Notice.deleteByUser(id, ctx.session.userId);
+    if(result.changes) {
+        let user = await User.get(ctx.session.userId);
+        await user.decrementQuota();
+        return ctx.response.body = {success: true};
     }
+    ctx.status = 403;
+    ctx.response.body = {status: false, message: 'Unauthorised.'};
 };
 exports.v.delete = {
     params: {

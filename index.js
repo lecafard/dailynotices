@@ -5,6 +5,9 @@ const Koa = require('koa'),
       BodyParser = require('koa-bodyparser'),
       Mount = require('koa-mount'),
       Static = require('koa-static'),
+      http = require('http'),
+      path = require('path'),
+      fs = require('fs'),
       Session = require('koa-session');
 
 let app = new Koa();
@@ -29,5 +32,22 @@ app.use(routes.routes());
 app.use(routes.allowedMethods());
 app.use(Mount('/static', Static(__dirname + '/static')));
 
-console.log(`Application listening on port ${port}.`);
-app.listen(port);
+var server = http.createServer(app.callback());
+server.listen(port, (err) => {
+    if(!parseInt(port, 10)) {
+        // chmod 666
+        fs.chmodSync(port, '0666');
+    }
+    console.log(`Application listening on port ${port}.`);
+});
+server.on('error', (e) => {
+    if(parseInt(port, 10)) {
+        throw err;
+    }
+
+    fs.unlinkSync(port);
+    server.listen(port, (err) => {
+        // chmod 666
+        fs.chmodSync(port, '0666');
+    });
+});
