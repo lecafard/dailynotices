@@ -1,0 +1,40 @@
+.notice {
+	margin: 5px;
+}
+
+.notice td {
+	text-align: left;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	word-wrap: break-word;
+}
+
+.addressed-to {
+	font-weight: bold;
+	padding-right: 20px;
+	min-width: 100px;
+}
+
+.title {
+	margin-top: 0;
+	font-size: 21pt;
+	font-weight: 400;
+	margin-bottom: 10px;
+}
+
+.btn-delete {
+	text-decoration: none;
+	color: red;
+	padding: 5px;
+	float: right;
+}
+
+.author {
+	font-weight: bold;
+}
+
+.message p {
+	margin: 0;
+	margin-bottom: 4px;
+	font-weight: 400;
+}

@@ -4,7 +4,8 @@
   "description": "Collect dirty quites",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-server": "nodemon --ignore frontend --ignore static"
   },
   "author": "Tom",
   "license": "ISC",

@@ -12,7 +12,7 @@ async function checkAuth(ctx, next) {
         return next();
     }
     ctx.status = 401;
-    ctx.response.body = "Please log in"; 
+    ctx.response.body = {status: false, message: "Please log in"}; 
 }
 
 async function errHandler(ctx, next) {
@@ -33,11 +33,16 @@ async function errHandler(ctx, next) {
 }
 
 
-router.get('/', IndexController.home);
+router.get('/', IndexController.index);
+router.get(/^\/app(?:\/|$)/, IndexController.app);
 router.get('/login', AuthController.authenticate);
 router.get('/login/callback', AuthController.authCallback);
 router.get('/logout', async function(ctx) {
     ctx.session = null;
+    ctx.cookies.set('logged_in', null, {
+        httpOnly: false, 
+        signed: false,
+    });
     ctx.redirect('/');
 });
 

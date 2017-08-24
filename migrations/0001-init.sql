@@ -10,7 +10,6 @@ CREATE TABLE notices (
     message TEXT,
     author_name VARCHAR(40),
     addressed_to VARCHAR(40),
-    vote_id CHAR(24) DEFAULT (LOWER(HEX(RANDOMBLOB(12)))) UNIQUE NOT NULL,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 

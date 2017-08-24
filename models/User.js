@@ -1,4 +1,5 @@
-let sqlite = require('../db');
+const config = require('../config');
+let sqlite = require('../lib/db');
 
 class User {
     constructor(opt) {
@@ -8,20 +9,20 @@ class User {
 
     static async get(id) {
         let db = await sqlite;
-        let res = await db.get('SELECT id,quota FROM users where id=?;', id);
+        let res = await db.get(`SELECT id,${config.quota}-quota AS quota FROM users where id=?;`, id);
         return res ? new this(res) : null;
     }
 
     async incrementQuota() {
         let db = await sqlite;
         await db.run('UPDATE users SET quota=quota+1 WHERE id=?;', this.id);
-        return this.quota++;
+        return this.quota--;
     }
     
     async decrementQuota() {
         let db = await sqlite;
         await db.run('UPDATE users SET quota=quota-1 WHERE id=?;', this.id);
-        return this.quota--;
+        return this.quota++;
     }
 
     static async authenticate(id) {

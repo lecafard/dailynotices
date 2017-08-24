@@ -1,4 +1,4 @@
-const oauth2 = require('../oauth2');
+const oauth2 = require('../lib/oauth2');
 
 /*
  * Method: GET
@@ -6,7 +6,7 @@ const oauth2 = require('../oauth2');
  */
 exports.authenticate = async function (ctx) {
     if (ctx.session.userId) {
-        return ctx.response.body = "Already Authenticated. Please log out first.";
+        return ctx.redirect('/app');
     }
 
     let redirectUri = `http://${ctx.get('host')}/login/callback`;
@@ -20,6 +20,10 @@ exports.authenticate = async function (ctx) {
 
 
 exports.authCallback = async function (ctx) {
+    if (ctx.session.userId) {
+        return ctx.redirect('/app');
+    }
+
     let redirectUri = `http://${ctx.get('host')}/login/callback`;
     let {code, state} = ctx.query;
     let options = {
@@ -30,14 +34,20 @@ exports.authCallback = async function (ctx) {
     if (state != ctx.session.oauthState) {
         return ctx.response.body = "The state's messed up";
     }
+    ctx.session.oauthState = null;
     
     try {
         let user = await oauth2.authenticate(options);
 
         ctx.session.userId = user.id;
         ctx.session.userName = user.name;
+        ctx.cookies.set('logged_in', 1, {
+            httpOnly: false, 
+            signed: false,
+            maxAge: 7*24*3600*1000
+        });
         ctx.session.save();
-        ctx.redirect('/');
+        ctx.redirect('/app');
         
     } catch (e) {
         console.error(e);

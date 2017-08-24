@@ -11,7 +11,7 @@ const Koa = require('koa'),
       Session = require('koa-session');
 
 let app = new Koa();
-require('./db');
+require('./lib/db');
 let routes = require('./routes');
 
 app.use(BodyParser({
@@ -23,9 +23,7 @@ app.use(BodyParser({
 app.keys = config.session.keys;
 app.use(Session({
     key: 'quotednsbhs-sid',
-    cookie: {
-        maxAge: 7*24*60*60*1000 // 1 week
-    }
+    maxAge: 7*24*60*60*1000 // 1 week
 }, app));
 
 app.use(routes.routes());

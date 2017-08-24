@@ -1,0 +1,28 @@
+.nav {
+	margin: 0;
+	padding: 0;
+	background-color: navy;
+}
+
+.nav .nav-main {
+	list-style-type: none;
+	height: 40px;
+	margin: 0;
+	padding-top: 20px;
+}
+
+.nav li {
+	display: inline-block;
+}
+
+.nav li a {
+	display: block;
+	padding-left: 20px;
+	padding-right: 20px;
+	text-decoration: none;
+	color: white;
+}
+
+.right {
+	float: right;
+}
