@@ -1,10 +1,11 @@
 let webpack = require('webpack'),
     path = require('path'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
-    ExtractTextPlugin = require("extract-text-webpack-plugin");
+    ExtractTextPlugin = require("extract-text-webpack-plugin"),
+    ClosureCompilerPlugin = require('webpack-closure-compiler');
 
 let cfg = {
-    entry: ['babel-polyfill', 'whatwg-fetch', path.join(__dirname, './src')],
+    entry: ['whatwg-fetch', path.join(__dirname, './src')],
     output: {
         path: path.join(__dirname, '../static'),
         filename: 'scripts/bundle-[hash].js',
@@ -12,6 +13,7 @@ let cfg = {
     },
     module: {
         rules: [
+        /*
             {
                 test: /\.js$/,
                 exclude: /(node_modules|bower_components)/,
@@ -21,7 +23,8 @@ let cfg = {
                         presets: ['env']
                     }
                 }
-            }, {
+            }, */
+            {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({ 
                     fallback: 'style-loader',
@@ -46,7 +49,13 @@ let cfg = {
             filename: 'html/app.html',
             template: path.join(__dirname, 'tpl-app.ejs')
         }),
-        new ExtractTextPlugin('styles/bundle-[hash].css')
+        new ExtractTextPlugin('styles/bundle-[hash].css'),
+        new ClosureCompilerPlugin({
+            compiler: {
+                language_out: 'ECMASCRIPT5',
+                compilation_level: 'SIMPLE'
+            }
+        })
     ]
 };
 

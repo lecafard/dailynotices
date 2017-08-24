@@ -38,12 +38,14 @@ class Notice {
     
     static async getAll() {
         let db = await sqlite;
-        return db.all('SELECT id, title, author_name, addressed_to, timestamp, message FROM notices;');
+        return db.all('SELECT id, title, author_name, addressed_to, timestamp, message FROM notices \
+            ORDER BY timestamp DESC;');
     }
 
     static async getByUser(userId) {
         let db = await sqlite;
-        return db.all('SELECT id, title, author_name, addressed_to, timestamp, message FROM notices WHERE user_id=?;', userId);
+        return db.all('SELECT id, title, author_name, addressed_to, timestamp, message \
+            FROM notices WHERE user_id=? ORDER BY timestamp DESC;', userId);
     }
 }
 
