@@ -6,8 +6,10 @@ import './style.css';
 
 let root = document.body;
 
-m.route(root, '/app', {
-    '/app': Index,
-    '/app/notices': Notices.List,
-    '/app/notices/new': Notices.Create
+m.route.prefix("/app");
+
+m.route(root, '/', {
+    '/': Index,
+    '/notices': Notices.List,
+    '/notices/new': Notices.Create
 });

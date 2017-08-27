@@ -17,8 +17,8 @@ export default class Navbar {
     view() {
         return m('nav', {className: style.nav}, m('ul', {className: style.navMain}, 
             [
-                m('li', m('a[href=/app]', {oncreate: m.route.link}, 'My Notices')),
-                m('li', m('a[href=/app/notices]', {oncreate: m.route.link}, 'All Notices')),
+                m('li', m('a[href=/]', {oncreate: m.route.link}, 'My Notices')),
+                m('li', m('a[href=/notices]', {oncreate: m.route.link}, 'All Notices')),
                 m('ul', {className: style.right}, [
                     m('li', m('a[href=/logout]', 'Logout'))
                 ])

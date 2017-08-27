@@ -29,7 +29,7 @@ export default class IndexPage {
 	                m('h1', 'My Notices'),
 	                m('span', {className: style.quota}, `Quota Left: ${store.user.quota}`),
 	                m('a', {onclick: this.refresh, className: `${style.btn} ${style.btnRefresh}`}, 'Refresh'),
-	                store.user.quota > 0 ? m('a[href=/app/notices/new]', {
+	                store.user.quota > 0 ? m('a[href=/notices/new]', {
 	                	oncreate: m.route.link,
 	                	className: `${style.btn} ${style.btnNew}`
 	                }, 'New Notice') : null,

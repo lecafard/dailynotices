@@ -59,11 +59,18 @@ class Create  {
             e.preventDefault();
             let res = await store.postNotice(self.data);
             if(res.status) {
-                m.route.set('/app');
+                m.route.set('/');
             } else {
                 self.error = res.message;
                 m.redraw();
             }
+        }
+    }
+
+    async oninit() {
+        await store.getUser();
+        if (store.user.quota <= 0) {
+            m.route.set('/');
         }
     }
 
@@ -110,7 +117,9 @@ class Create  {
                         }),
 
                         m('br'),
-                        m('a[href=/app]', {
+                        m('p', 'Note: Posts will be fully anonymous to anyone else.'),
+                        m('br'),
+                        m('a[href=/]', {
                             oncreate: m.route.link,
                             className: `${style.btn} ${style.btnCancel}`
                         }, 'Cancel'),
