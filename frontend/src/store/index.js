@@ -56,8 +56,8 @@ class Store {
         }
     }
     
-    async fetchNotices() {
-        let res = await fetch('/api/notices', {
+    async fetchNotices(sort) {
+        let res = await fetch(`/api/notices${sort ? '/'+sort : ''}`, {
             credentials: 'include'
         });
 
@@ -155,8 +155,38 @@ class Store {
         } else {
             alert(`Notice delete error, server returned ${res.status}.`);
         }
+    }
 
+    async voteNotice(idx) {
+        let res = await fetch(`/api/notices/${this.notices[idx].id}/vote`, {
+            method: 'PUT',
+            credentials: 'include'
+        })
 
+        if (res.ok) {
+            this.notices[idx].voted = 1;
+            this.notices[idx].votes++;
+        } else if (res.status == 401) {
+            logout();
+        } else {
+            alert(`Notice vote error, server returned ${res.status}.`);
+        }
+    }
+
+    async unVoteNotice(idx) {
+        let res = await fetch(`/api/notices/${this.notices[idx].id}/vote`, {
+            method: 'DELETE',
+            credentials: 'include'
+        })
+
+        if (res.ok) {
+            this.notices[idx].voted = 0;
+            this.notices[idx].votes--;
+        } else if (res.status == 401) {
+            logout();
+        } else {
+            alert(`Notice unvote error, server returned ${res.status}.`);
+        }
     }
 }
 

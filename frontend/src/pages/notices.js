@@ -14,17 +14,27 @@ function bind(v,d) {
 class List {
     constructor() {
         this.notices = [];
+        this.showVotes = true;
     }
     
-    async oninit() {
-        await store.getUser();
-        await store.getNotices();
-        m.redraw();
+    oninit() {
+        store.getUser().then(() => {
+            return store.getNotices();
+        }).then(() => {m.redraw();});
     }
 
-    async refresh() {
-        await store.fetchNotices();
-        m.redraw();
+    refresh() {
+        store.fetchNotices.then(m.redraw);
+    }
+
+    toggleVotes(o) {
+        return function () {
+            o.showVotes = !o.showVotes;
+        }
+    }
+
+    sortNotices(e) {
+        store.fetchNotices(e.target.value).then(m.redraw);
     }
 
     view() {
@@ -34,11 +44,18 @@ class List {
                 m('div', {className: globalStyle.container}, [
                     m('h1', 'All Notices'),
                     m('a', {onclick: this.refresh, className: `${style.btn} ${style.btnRefresh}`}, 'Refresh'),
+                    m('a', {onclick: this.toggleVotes(this), className: `${style.btn} ${style.btnToggle}`}, 'Toggle Votes'),
+                    m('select', {onchange: this.sortNotices, style: 'float:right;'}, [
+                        m('option', {value: 'votes'}, 'Votes'),
+                        m('option', {value: 'new'}, 'New'),
+                        m('option', {value: 'old'}, 'Old')
+                    ]),
                     !store.fetching.notices ? m('table', {
                             className: style.notices
                         },
-                        m('tbody', store.notices.map((data) => {
-                            return m(Notice,{data, editable: false});
+                        m('tbody', store.notices.map((data, idx) => {
+                            return m(Notice,{data, editable: false, 
+                                index: idx, showVotes: this.showVotes});
                         })
                     )) : m('p', 'Loading...')
                 ])

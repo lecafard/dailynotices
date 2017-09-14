@@ -17,6 +17,10 @@
 	background-color: dodgerblue;
 }
 
+.btn-toggle {
+	background-color: teal;
+}
+
 .btn-cancel {
 	background-color: red;
 }

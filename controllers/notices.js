@@ -14,7 +14,7 @@ exports.new = async function(ctx) {
     if (user.quota <= 0) {
         // Stop right there
         ctx.status = 403;
-        return ctx.response.body = {status: false, message: "Quota used up"};
+        return ctx.response.body = {status: false, message: 'Quota used up'};
     }
     let {title, message, addressed_to, author_name, anonymous} = ctx.request.body;
     
@@ -101,6 +101,32 @@ exports.v.get = {
 
 /*
  * Method: GET
+ * Description: Vote a particular message
+ */
+exports.vote = async function(ctx) {
+    let res = await Notice.vote(ctx.params.id, ctx.session.userId);
+    if (!res) {
+        ctx.status = 400;
+        return ctx.response.body = {status: false, message: 'Already Voted'};
+    }
+    ctx.response.body = {status: true};
+}
+
+ /*
+ * Method: GET
+ * Description: Unvote a particular message.
+ */
+exports.unVote = async function(ctx) {
+    let res = await Notice.unVote(ctx.params.id, ctx.session.userId);
+    if (!res) {
+        ctx.status = 400;
+        return ctx.response.body = {status: false, message: 'Not Voted'};
+    }
+    ctx.response.body = {status: true};
+}
+
+/*
+ * Method: GET
  * Description: List user's messages (not anonymous), with id.
  */
 exports.listMe = async function(ctx) {
@@ -114,10 +140,26 @@ exports.listMe = async function(ctx) {
 
 /* 
  * Method: GET
- * Description: List all messages.
+ * Description: List all messages (by votes).
  */
-exports.listAll = async function(ctx) {
-    ctx.response.body = {status: true, notices: await Notice.getAll()};
+exports.listAllByVotes = async function(ctx) {
+    ctx.response.body = {status: true, notices: await Notice.getAll(ctx.session.userId)};
+};
+
+/* 
+ * Method: GET
+ * Description: List all messages (by new).
+ */
+exports.listAllByNew = async function(ctx) {
+    ctx.response.body = {status: true, notices: await Notice.getAll(ctx.session.userId, 'DESC', false)};
+};
+
+/* 
+ * Method: GET
+ * Description: List all messages (by old).
+ */
+exports.listAllByOld = async function(ctx) {
+    ctx.response.body = {status: true, notices: await Notice.getAll(ctx.session.userId, 'ASC', false)};
 };
 
 /*

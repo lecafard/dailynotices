@@ -8,6 +8,7 @@ import style from './common.css';
 export default class IndexPage {
 	constructor() {
 		this.notices = [];
+        this.showVotes = true;
 	}
 
 	async oninit() {
@@ -20,6 +21,12 @@ export default class IndexPage {
         await store.fetchUserNotices();
         m.redraw();
     }
+    
+    toggleVotes(o) {
+        return function () {
+            o.showVotes = !o.showVotes;
+        }
+    }
 
     view() {
         return [
@@ -29,6 +36,7 @@ export default class IndexPage {
 	                m('h1', 'My Notices'),
 	                m('span', {className: style.quota}, `Quota Left: ${store.user.quota}`),
 	                m('a', {onclick: this.refresh, className: `${style.btn} ${style.btnRefresh}`}, 'Refresh'),
+                    m('a', {onclick: this.toggleVotes(this), className: `${style.btn} ${style.btnToggle}`}, 'Toggle Votes'),
 	                store.user.quota > 0 ? m('a[href=/notices/new]', {
 	                	oncreate: m.route.link,
 	                	className: `${style.btn} ${style.btnNew}`
@@ -37,7 +45,7 @@ export default class IndexPage {
                     		className: style.notices
                         },
                         m('tbody', store.userNotices.map((data) => {
-                            return m(Notice,{data, editable: true});
+                            return m(Notice,{data, editable: true, showVotes: this.showVotes});
                         })
                     )) : m('p', 'Loading...')
                 ])

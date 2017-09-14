@@ -36,16 +36,36 @@ class Notice {
         return db.get('SELECT id, title, author_name, addressed_to, timestamp, message FROM notices WHERE id=? LIMIT 1;', id);
     }
     
-    static async getAll() {
+    static async getAll(uid, tssort, vsort=true) {
         let db = await sqlite;
-        return db.all('SELECT id, title, author_name, addressed_to, timestamp, message FROM notices \
-            ORDER BY timestamp DESC;');
+        return db.all(`SELECT id, title, (SELECT COUNT() FROM votes WHERE votes.notice_id = id) as votes, \
+            author_name, addressed_to, timestamp, message \
+            ${uid ? ', EXISTS(SELECT 1 FROM votes WHERE votes.user_id=? AND votes.notice_id=id LIMIT 1) as voted' : ''} \
+            FROM notices ORDER BY ${vsort ? 'votes DESC,': ''} timestamp ${tssort ? tssort : 'DESC'};`, uid);
     }
 
-    static async getByUser(userId) {
+    static async vote(id, uid) {
         let db = await sqlite;
-        return db.all('SELECT id, title, author_name, addressed_to, timestamp, message \
-            FROM notices WHERE user_id=? ORDER BY timestamp DESC;', userId);
+        try {
+            await db.run('INSERT INTO votes (notice_id, user_id) VALUES (?, ?);', [id, uid]);
+            return true;
+        } catch(e) {
+            return false;
+        }
+    }
+
+    static async unVote(id, uid) {
+        let db = await sqlite;     
+        let res = await db.run('DELETE FROM votes WHERE notice_id=? AND user_id=?;', [id, uid]);
+        return !!res.stmt.changes;
+    }
+
+    static async getByUser(uid) {
+        let db = await sqlite;
+        return db.all('SELECT id, title, author_name, addressed_to, timestamp, message, \
+            (SELECT COUNT() FROM votes WHERE votes.notice_id = id) as votes, \
+            EXISTS(SELECT 1 FROM votes WHERE votes.user_id=? AND votes.notice_id=id LIMIT 1) as voted \
+            FROM notices WHERE user_id=? ORDER BY timestamp DESC;', [uid, uid]);
     }
 }
 

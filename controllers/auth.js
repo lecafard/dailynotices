@@ -37,7 +37,7 @@ exports.authCallback = async function (ctx) {
     ctx.session.oauthState = null;
     
     try {
-        let user = await oauth2.authenticate(options);
+        let user = await oauth2.authenticate(options, ctx.screwup);
 
         ctx.session.userId = user.id;
         ctx.session.userName = user.name;
@@ -50,7 +50,6 @@ exports.authCallback = async function (ctx) {
         ctx.redirect('/app');
         
     } catch (e) {
-        console.error(e);
-        ctx.response.body = "Authentication Error";
+        ctx.status = 500;
     }
 }

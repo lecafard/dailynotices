@@ -2,6 +2,28 @@
 	margin: 5px;
 }
 
+.btn {
+	text-decoration: none;
+	color: white;
+	padding: 5px;
+	border: none;
+	font-size: 12pt;
+	padding: 10px;
+}
+
+.btn-vote {
+	background-color: blue;
+}
+
+.btn-voted {
+	background-color: green;
+}
+
+.btn-vote, .btn-voted {
+	float: right;
+}
+
+
 .notice td {
 	text-align: left;
 	padding-top: 20px;
