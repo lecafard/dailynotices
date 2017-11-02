@@ -1,4 +1,1 @@
-Fake Daily Notices Collator
-===========================
-
-Let's make some fake daily notices.
+I don't know what I'm doing.
