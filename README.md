@@ -1,1 +1,4 @@
-Phoney stuff here.
+Daily Notices
+=============
+
+Publish your messages here.
